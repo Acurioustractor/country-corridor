@@ -1,4 +1,48 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Load YouTube API
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    
+    // YouTube Player
+    let player;
+    window.onYouTubeIframeAPIReady = function() {
+        player = new YT.Player('youtube-player', {
+            videoId: 'mO7a6zXOjJQ', // The Country Corridor video
+            playerVars: {
+                'autoplay': 1,
+                'controls': 0,
+                'rel': 0,
+                'showinfo': 0,
+                'loop': 1,
+                'playlist': 'mO7a6zXOjJQ', // Needed for looping
+                'mute': 1,
+                'playsinline': 1,
+                'modestbranding': 1,
+                'iv_load_policy': 3,
+                'disablekb': 1
+            },
+            events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange
+            }
+        });
+    };
+    
+    function onPlayerReady(event) {
+        event.target.playVideo();
+        // Ensure the video is muted (required for autoplay)
+        event.target.mute();
+    }
+    
+    function onPlayerStateChange(event) {
+        // If video ends, restart it
+        if (event.data === YT.PlayerState.ENDED) {
+            player.playVideo();
+        }
+    }
+
     // Mobile navigation toggle
     const burger = document.querySelector('.burger');
     const nav = document.querySelector('.nav-links');

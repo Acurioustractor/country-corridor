@@ -157,11 +157,36 @@ a:hover {
 .hero-video {
     width: 100%;
     height: 100%;
-    object-fit: cover;
     position: absolute;
     top: 0;
     left: 0;
     z-index: 1;
+    pointer-events: none;
+}
+
+#youtube-player {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: 1;
+    pointer-events: none;
+}
+
+@media (min-aspect-ratio: 16/9) {
+    #youtube-player {
+        height: 300%;
+    }
+}
+
+@media (max-aspect-ratio: 16/9) {
+    #youtube-player {
+        width: 300%;
+    }
 }
 
 .placeholder-video {
