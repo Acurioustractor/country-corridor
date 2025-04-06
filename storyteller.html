@@ -286,7 +286,9 @@
                 // Handle image
                 let photoHtml = '';
                 if (fields.Photo && fields.Photo.length > 0) {
-                    photoHtml = `<img src="${fields.Photo[0].url}" alt="${fields.Name || 'Storyteller'}">`;
+                    // Ensure HTTPS URL
+                    const photoUrl = fields.Photo[0].url.replace('http://', 'https://');
+                    photoHtml = `<img src="${photoUrl}" alt="${fields.Name || 'Storyteller'}" loading="lazy">`;
                 }
                 
                 // Handle themes

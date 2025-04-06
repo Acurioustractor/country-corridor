@@ -21,25 +21,52 @@ document.addEventListener('DOMContentLoaded', function() {
                 'playsinline': 1,
                 'modestbranding': 1,
                 'iv_load_policy': 3,
-                'disablekb': 1
+                'disablekb': 1,
+                'origin': window.location.origin,
+                'enablejsapi': 1
             },
             events: {
                 'onReady': onPlayerReady,
-                'onStateChange': onPlayerStateChange
+                'onStateChange': onPlayerStateChange,
+                'onError': onPlayerError
             }
         });
     };
     
     function onPlayerReady(event) {
+        // Force play video
         event.target.playVideo();
         // Ensure the video is muted (required for autoplay)
         event.target.mute();
+        
+        // Attempt to play again if needed after a short delay
+        setTimeout(function() {
+            if (player && player.getPlayerState() !== YT.PlayerState.PLAYING) {
+                player.playVideo();
+            }
+        }, 2000);
     }
     
     function onPlayerStateChange(event) {
         // If video ends, restart it
         if (event.data === YT.PlayerState.ENDED) {
-            player.playVideo();
+            event.target.playVideo();
+        } else if (event.data === YT.PlayerState.PAUSED) {
+            // If somehow paused, resume playing
+            setTimeout(function() {
+                event.target.playVideo();
+            }, 500);
+        }
+    }
+    
+    function onPlayerError(event) {
+        console.error('YouTube player error:', event.data);
+        // Try to recover from error by recreating the player
+        if (player) {
+            setTimeout(function() {
+                player.destroy();
+                onYouTubeIframeAPIReady();
+            }, 2000);
         }
     }
 
@@ -449,7 +476,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Handle image
                 let portraitHtml = '';
                 if (fields.Photo && fields.Photo.length > 0) {
-                    portraitHtml = `<img src="${fields.Photo[0].url}" alt="${fields.Name || 'Community member'}">`;
+                    // Access the URL directly and use HTTPS
+                    const photoUrl = fields.Photo[0].url.replace('http://', 'https://');
+                    portraitHtml = `<img src="${photoUrl}" alt="${fields.Name || 'Community member'}" loading="lazy">`;
                 }
                 
                 // Use the first quote or default text
@@ -525,7 +554,9 @@ document.addEventListener('DOMContentLoaded', function() {
             // Handle image
             let imageHtml = '';
             if (fields.Photo && fields.Photo.length > 0) {
-                imageHtml = `<img src="${fields.Photo[0].url}" alt="${fields.Name || 'Storyteller'}">`;
+                // Access the URL directly and use HTTPS
+                const photoUrl = fields.Photo[0].url.replace('http://', 'https://');
+                imageHtml = `<img src="${photoUrl}" alt="${fields.Name || 'Storyteller'}" loading="lazy">`;
             }
             
             // Handle themes
