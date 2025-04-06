@@ -94,7 +94,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (storytellersGrid) {
         // Airtable API configuration
         const airtableBaseId = 'app7G3Ae65pBblJke';
-        const airtableTableName = 'Storytellers';
+        const airtableTableName = 'tbl9zxLsGOd3fjWXp';
+        const airtableViewId = 'viw75xVMkQsZhXgzw';
         const airtableApiKey = 'patn343QLEgDnD033.1b9fa9553af0b4c039b648612b304b93f94830d8570dcf71df9d7e3b4bbd03b4';
         
         // Variables to store data
@@ -104,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Function to fetch storytellers from Airtable
         async function fetchStorytellers() {
             try {
-                const response = await fetch(`https://api.airtable.com/v0/${airtableBaseId}/${airtableTableName}`, {
+                const response = await fetch(`https://api.airtable.com/v0/${airtableBaseId}/${airtableTableName}?view=${airtableViewId}`, {
                     headers: {
                         'Authorization': `Bearer ${airtableApiKey}`
                     }
@@ -130,6 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Function to create HTML for a storyteller card
         function createStorytellerCard(storyteller) {
             const fields = storyteller.fields;
+            const storytellerId = storyteller.id;
             
             // Handle image
             let imageHtml = '';
@@ -146,17 +148,19 @@ document.addEventListener('DOMContentLoaded', function() {
             
             return `
                 <div class="storyteller-card" data-location="${fields.Location || ''}">
-                    <div class="storyteller-image">
-                        ${imageHtml}
-                    </div>
-                    <div class="storyteller-info">
-                        <h3 class="storyteller-name">${fields.Name || 'Anonymous'}</h3>
-                        <p class="storyteller-location">${fields.Location || 'Unknown Location'}</p>
-                        <p>${fields.Description || ''}</p>
-                        <div class="storyteller-themes">
-                            ${themesHtml}
+                    <a href="storyteller.html?id=${storytellerId}" class="storyteller-link">
+                        <div class="storyteller-image">
+                            ${imageHtml}
                         </div>
-                    </div>
+                        <div class="storyteller-info">
+                            <h3 class="storyteller-name">${fields.Name || 'Anonymous'}</h3>
+                            <p class="storyteller-location">${fields.Location || 'Unknown Location'}</p>
+                            <p class="storyteller-summary">${fields.Summary || ''}</p>
+                            <div class="storyteller-themes">
+                                ${themesHtml}
+                            </div>
+                        </div>
+                    </a>
                 </div>
             `;
         }

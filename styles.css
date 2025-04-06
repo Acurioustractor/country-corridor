@@ -506,6 +506,17 @@ a:hover {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
+.storyteller-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    height: 100%;
+}
+
+.storyteller-link:hover {
+    color: inherit;
+}
+
 .storyteller-image {
     height: 250px;
     background-color: #ddd;
@@ -557,6 +568,14 @@ a:hover {
     font-size: 0.85rem;
     margin-right: 0.5rem;
     margin-bottom: 0.5rem;
+}
+
+.storyteller-summary {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
 }
 
 .loading-indicator {
