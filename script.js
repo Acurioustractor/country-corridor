@@ -87,17 +87,104 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 7000);
     }
 
-    // Airtable Integration for Storytellers
+    // Airtable API configuration
+    const airtableBaseId = 'app7G3Ae65pBblJke';
+    const airtableTableName = 'tbl9zxLsGOd3fjWXp';
+    const airtableViewId = 'viw75xVMkQsZhXgzw';
+    const airtableApiKey = 'patn343QLEgDnD033.1b9fa9553af0b4c039b648612b304b93f94830d8570dcf71df9d7e3b4bbd03b4';
+
+    // Featured Voices (Community Voices section)
+    const featuredVoicesContainer = document.getElementById('featured-voices');
+    
+    if (featuredVoicesContainer) {
+        // Function to fetch featured storytellers
+        async function fetchFeaturedStorytellers() {
+            try {
+                // Fetch all storytellers from the view
+                const response = await fetch(`https://api.airtable.com/v0/${airtableBaseId}/${airtableTableName}?view=${airtableViewId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${airtableApiKey}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data from Airtable');
+                }
+                
+                const data = await response.json();
+                
+                // Filter for Kirsty, Norman, and Dianne
+                const featuredNames = ['Kirsty', 'Norman', 'Dianne'];
+                const featuredStorytellers = data.records.filter(record => 
+                    record.fields.Name && featuredNames.some(name => 
+                        record.fields.Name.includes(name)
+                    )
+                );
+                
+                if (featuredStorytellers.length > 0) {
+                    renderFeaturedVoices(featuredStorytellers);
+                } else {
+                    // If specific storytellers aren't found, use the first three
+                    const firstThree = data.records.slice(0, 3);
+                    renderFeaturedVoices(firstThree);
+                }
+            } catch (error) {
+                console.error('Error fetching featured storytellers:', error);
+                featuredVoicesContainer.innerHTML = `
+                    <div class="error-message">
+                        <p>Couldn't load community voices. Please try again later.</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Function to render featured voices
+        function renderFeaturedVoices(storytellers) {
+            const voicesHtml = storytellers.map(storyteller => {
+                const fields = storyteller.fields;
+                const storytellerId = storyteller.id;
+                
+                // Handle image
+                let portraitHtml = '';
+                if (fields.Photo && fields.Photo.length > 0) {
+                    portraitHtml = `<img src="${fields.Photo[0].url}" alt="${fields.Name || 'Community member'}">`;
+                }
+                
+                // Use the first quote or default text
+                let quoteText = "No quote available";
+                if (fields.Quotes && fields.Quotes.length > 0) {
+                    quoteText = fields.Quotes[0];
+                } else if (fields.Summary) {
+                    quoteText = fields.Summary;
+                }
+                
+                return `
+                    <div class="voice-card">
+                        <a href="storyteller.html?id=${storytellerId}" class="voice-card-link">
+                            <div class="portrait">
+                                ${portraitHtml}
+                            </div>
+                            <div class="quote">
+                                <p>"${quoteText}"</p>
+                                <cite>— ${fields.Name || 'Anonymous'}, ${fields.Location || 'Community member'}</cite>
+                            </div>
+                        </a>
+                    </div>
+                `;
+            }).join('');
+            
+            featuredVoicesContainer.innerHTML = voicesHtml;
+        }
+        
+        // Initialize featured voices
+        fetchFeaturedStorytellers();
+    }
+
+    // Storytellers Gallery
     const storytellersGrid = document.querySelector('.storytellers-grid');
     const locationFilter = document.getElementById('location-filter');
     
     if (storytellersGrid) {
-        // Airtable API configuration
-        const airtableBaseId = 'app7G3Ae65pBblJke';
-        const airtableTableName = 'tbl9zxLsGOd3fjWXp';
-        const airtableViewId = 'viw75xVMkQsZhXgzw';
-        const airtableApiKey = 'patn343QLEgDnD033.1b9fa9553af0b4c039b648612b304b93f94830d8570dcf71df9d7e3b4bbd03b4';
-        
         // Variables to store data
         let allStorytellers = [];
         let uniqueLocations = new Set();

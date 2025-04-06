@@ -269,10 +269,28 @@ a:hover {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
+.voice-card-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
 .portrait {
     height: 200px;
     background-color: #ddd;
     overflow: hidden;
+    position: relative;
+}
+
+.portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.voice-card:hover .portrait img {
+    transform: scale(1.05);
 }
 
 .voice-card .quote {
