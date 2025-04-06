@@ -25,6 +25,264 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    
+    // Parallax effect on hero section
+    const parallaxElements = document.querySelectorAll('.parallax-element');
+    
+    function updateParallax() {
+        const scrollY = window.scrollY;
+        
+        parallaxElements.forEach(element => {
+            const speed = parseFloat(element.getAttribute('data-speed')) || 0.2;
+            const yPos = -(scrollY * speed);
+            element.style.transform = `translateY(${yPos}px)`;
+        });
+    }
+    
+    window.addEventListener('scroll', updateParallax);
+    
+    // Waypoints navigation
+    const waypoints = document.querySelectorAll('.waypoint');
+    const sections = document.querySelectorAll('section, .hero-container');
+    const progressBar = document.querySelector('.waypoints-progress:before');
+    
+    function updateWaypoints() {
+        if (!sections.length) return;
+        
+        const scrollPosition = window.scrollY + window.innerHeight / 3;
+        const documentHeight = document.documentElement.scrollHeight;
+        const viewportHeight = window.innerHeight;
+        const scrollPercentage = (window.scrollY / (documentHeight - viewportHeight)) * 100;
+        
+        if (progressBar) {
+            progressBar.style.transform = `scaleY(${scrollPercentage / 100})`;
+        }
+        
+        // Find the current section
+        let currentSection = null;
+        for (let i = 0; i < sections.length; i++) {
+            const section = sections[i];
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.offsetHeight;
+            
+            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                currentSection = section.id;
+                break;
+            }
+        }
+        
+        // Update waypoints
+        if (currentSection) {
+            waypoints.forEach(waypoint => {
+                if (waypoint.getAttribute('data-section') === currentSection) {
+                    waypoint.classList.add('active');
+                } else {
+                    waypoint.classList.remove('active');
+                }
+            });
+        }
+    }
+    
+    window.addEventListener('scroll', updateWaypoints);
+    updateWaypoints(); // Initialize waypoints
+    
+    // Scroll indicator
+    const scrollIndicator = document.querySelector('.scroll-indicator');
+    if (scrollIndicator) {
+        scrollIndicator.addEventListener('click', () => {
+            const visionSection = document.getElementById('vision');
+            if (visionSection) {
+                window.scrollTo({
+                    top: visionSection.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+            }
+        });
+        
+        // Hide scroll indicator when scrolling down
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                scrollIndicator.style.opacity = '0';
+                scrollIndicator.style.visibility = 'hidden';
+            } else {
+                scrollIndicator.style.opacity = '1';
+                scrollIndicator.style.visibility = 'visible';
+            }
+        });
+    }
+    
+    // Scroll reveal animations
+    const fadeElements = document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right, .fade-in-scale');
+    
+    function revealOnScroll() {
+        fadeElements.forEach(element => {
+            const elementTop = element.getBoundingClientRect().top;
+            const triggerPoint = window.innerHeight * 0.85;
+            
+            if (elementTop < triggerPoint) {
+                element.classList.add('visible');
+            }
+        });
+        
+        sections.forEach(section => {
+            const sectionTop = section.getBoundingClientRect().top;
+            const triggerPoint = window.innerHeight * 0.75;
+            
+            if (sectionTop < triggerPoint) {
+                section.classList.add('visible');
+            }
+        });
+    }
+    
+    window.addEventListener('scroll', revealOnScroll);
+    window.addEventListener('resize', revealOnScroll);
+    revealOnScroll(); // Initial check
+    
+    // Initialize interactive map
+    initializeMap();
+    
+    // Function to initialize the map
+    function initializeMap() {
+        const mapContainer = document.getElementById('corridor-map');
+        if (!mapContainer) return;
+        
+        // Load the Leaflet CSS
+        const leafletCSS = document.createElement('link');
+        leafletCSS.rel = 'stylesheet';
+        leafletCSS.href = 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.css';
+        leafletCSS.integrity = 'sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==';
+        leafletCSS.crossOrigin = '';
+        document.head.appendChild(leafletCSS);
+        
+        // Load the Leaflet JS
+        const leafletScript = document.createElement('script');
+        leafletScript.src = 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.js';
+        leafletScript.integrity = 'sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==';
+        leafletScript.crossOrigin = '';
+        
+        leafletScript.onload = function() {
+            // Create map
+            const map = L.map('corridor-map').setView([-21.5, 134.5], 6); // Centered on Central Australia
+            
+            // Add tile layer (map background)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Define community locations
+            const communities = [
+                {
+                    name: 'Alice Springs',
+                    location: [-23.7, 133.88],
+                    type: 'community',
+                    description: 'Major town in the Northern Territory of Australia.',
+                    details: 'Alice Springs serves as a hub for many Central Australian communities and is home to several important First Nations organizations.'
+                },
+                {
+                    name: 'Tennant Creek',
+                    location: [-19.65, 134.19],
+                    type: 'community',
+                    description: 'Town in the Northern Territory of Australia.',
+                    details: 'Tennant Creek is a significant location along the Country Corridor, with many First Nations community members and initiatives.'
+                },
+                {
+                    name: 'Ti Tree',
+                    location: [-22.13, 133.42],
+                    type: 'community',
+                    description: 'Small community between Alice Springs and Tennant Creek.',
+                    details: 'Ti Tree is an important stop along the corridor with a strong First Nations presence.'
+                },
+                {
+                    name: 'Wilya Janta Housing',
+                    location: [-19.8, 134.1],
+                    type: 'project',
+                    description: 'Innovative housing project led by Warumungu Elders.',
+                    details: 'This project combines cultural knowledge with sustainable building practices to create housing that truly meets community needs.'
+                },
+                {
+                    name: 'The Goods Project',
+                    location: [-22.9, 133.7],
+                    type: 'project',
+                    description: 'Manufacturing high-quality bedding from recycled materials.',
+                    details: 'Addressing waste challenges while creating essential items and local employment opportunities.'
+                },
+                {
+                    name: 'Oonchiumpa',
+                    location: [-23.6, 133.9],
+                    type: 'project',
+                    description: 'Aboriginal-owned youth support organization.',
+                    details: 'Using a "Two Cultures, One World, Working Together" approach to support at-risk youth and improve outcomes.'
+                }
+            ];
+            
+            // Add markers for communities and projects
+            communities.forEach(place => {
+                const markerClass = place.type === 'community' ? 'community-marker' : 'project-marker';
+                const markerIcon = L.divIcon({
+                    className: `marker ${markerClass}`,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 30],
+                    popupAnchor: [0, -30]
+                });
+                
+                const marker = L.marker(place.location, {
+                    icon: markerIcon,
+                    title: place.name
+                }).addTo(map);
+                
+                // Create popup content
+                const popupContent = `
+                    <div class="map-popup">
+                        <h3>${place.name}</h3>
+                        <p>${place.description}</p>
+                        <p>${place.details}</p>
+                        <div class="map-popup-actions">
+                            <a href="#stories" class="map-popup-action">Related Stories</a>
+                            <a href="#storytellers" class="map-popup-action">Meet People</a>
+                        </div>
+                    </div>
+                `;
+                
+                marker.bindPopup(popupContent);
+                
+                // Add hover animation
+                marker.on('mouseover', function() {
+                    this._icon.style.transform = 'scale(1.2) translate3d(0,0,0)';
+                    this._icon.style.transition = 'transform 0.3s';
+                });
+                
+                marker.on('mouseout', function() {
+                    this._icon.style.transform = 'scale(1) translate3d(0,0,0)';
+                });
+            });
+            
+            // Add the corridor line connecting communities
+            const corridorPath = [
+                [-23.7, 133.88], // Alice Springs
+                [-22.13, 133.42], // Ti Tree
+                [-19.65, 134.19]  // Tennant Creek
+            ];
+            
+            const corridorLine = L.polyline(corridorPath, {
+                color: '#d35400',
+                weight: 4,
+                opacity: 0.7,
+                dashArray: '10, 10',
+                lineJoin: 'round'
+            }).addTo(map);
+            
+            // Animate the corridor line
+            let offset = 0;
+            setInterval(() => {
+                offset = (offset + 1) % 20;
+                corridorLine.setStyle({
+                    dashOffset: -offset
+                });
+            }, 100);
+        };
+        
+        document.head.appendChild(leafletScript);
+    }
 
     // Carousel functionality
     const storyCards = document.querySelectorAll('.story-card');

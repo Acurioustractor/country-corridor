@@ -29,32 +29,120 @@
         </nav>
     </header>
 
+    <!-- Visual Journey Waypoints -->
+    <div class="waypoints-container">
+        <ul class="waypoints">
+            <li class="waypoint" data-section="hero">
+                <a href="#hero">
+                    <span class="waypoint-icon"><i class="fas fa-home"></i></span>
+                    <span class="waypoint-label">Home</span>
+                </a>
+            </li>
+            <li class="waypoint" data-section="vision">
+                <a href="#vision">
+                    <span class="waypoint-icon"><i class="fas fa-eye"></i></span>
+                    <span class="waypoint-label">Vision</span>
+                </a>
+            </li>
+            <li class="waypoint" data-section="voices">
+                <a href="#voices">
+                    <span class="waypoint-icon"><i class="fas fa-comments"></i></span>
+                    <span class="waypoint-label">Voices</span>
+                </a>
+            </li>
+            <li class="waypoint" data-section="approach">
+                <a href="#approach">
+                    <span class="waypoint-icon"><i class="fas fa-compass"></i></span>
+                    <span class="waypoint-label">Approach</span>
+                </a>
+            </li>
+            <li class="waypoint" data-section="components">
+                <a href="#components">
+                    <span class="waypoint-icon"><i class="fas fa-puzzle-piece"></i></span>
+                    <span class="waypoint-label">Components</span>
+                </a>
+            </li>
+            <li class="waypoint" data-section="stories">
+                <a href="#stories">
+                    <span class="waypoint-icon"><i class="fas fa-book-open"></i></span>
+                    <span class="waypoint-label">Stories</span>
+                </a>
+            </li>
+            <li class="waypoint" data-section="network">
+                <a href="#network">
+                    <span class="waypoint-icon"><i class="fas fa-network-wired"></i></span>
+                    <span class="waypoint-label">Network</span>
+                </a>
+            </li>
+            <li class="waypoint" data-section="storytellers">
+                <a href="#storytellers">
+                    <span class="waypoint-icon"><i class="fas fa-users"></i></span>
+                    <span class="waypoint-label">Storytellers</span>
+                </a>
+            </li>
+            <li class="waypoint" data-section="contact">
+                <a href="#contact">
+                    <span class="waypoint-icon"><i class="fas fa-envelope"></i></span>
+                    <span class="waypoint-label">Contact</span>
+                </a>
+            </li>
+        </ul>
+        <div class="waypoints-progress"></div>
+    </div>
+
     <!-- Hero Section -->
-    <div class="hero-container">
+    <div id="hero" class="hero-container">
         <div class="hero-video-container">
-            <!-- Placeholder for video - will be replaced with actual video -->
-            <div class="placeholder-video"></div>
+            <video autoplay muted loop playsinline id="hero-video" class="hero-video">
+                <source src="https://player.vimeo.com/external/517090704.hd.mp4?s=ecbc9529b363bcc3a7af18ef6c0ea55536a2296c&profile_id=175" type="video/mp4">
+                <!-- If video fails to load, the CSS gradient will be visible as fallback -->
+            </video>
+            <div class="hero-overlay"></div>
         </div>
-        <div class="hero-overlay">
-            <h1>Country Corridor</h1>
-            <h2>Connected Communities, Collective Impact</h2>
-            <p>Transforming Central Australia Through Community-Led Change</p>
-            <a href="#vision" class="cta-button">Learn More</a>
+        <div class="hero-content">
+            <h1 class="hero-title parallax-element" data-speed="0.4">Country Corridor</h1>
+            <h2 class="hero-subtitle parallax-element" data-speed="0.3">Connected Communities, Collective Impact</h2>
+            <p class="hero-description parallax-element" data-speed="0.2">Transforming Central Australia Through Community-Led Change</p>
+            <a href="#vision" class="cta-button parallax-element" data-speed="0.1">
+                <span>Explore Our Vision</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        <div class="scroll-indicator">
+            <div class="chevron"></div>
+            <div class="chevron"></div>
+            <div class="chevron"></div>
+            <span>Scroll Down</span>
         </div>
     </div>
 
     <!-- Vision Section -->
     <section id="vision" class="section">
         <div class="container">
-            <div class="map-container">
-                <!-- Placeholder for map -->
-                <div class="placeholder-map"></div>
+            <div class="map-container fade-in">
+                <div id="corridor-map" class="interactive-map">
+                    <!-- Map will be added here via JavaScript -->
+                </div>
+                <div class="map-overlay">
+                    <div class="map-legend">
+                        <h3>Country Corridor</h3>
+                        <div class="legend-item">
+                            <span class="legend-icon community"></span>
+                            <span class="legend-text">Communities</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-icon project"></span>
+                            <span class="legend-text">Active Projects</span>
+                        </div>
+                        <div class="legend-icon-note">Click markers for details</div>
+                    </div>
+                </div>
             </div>
             <div class="section-content">
-                <h2>Our Vision</h2>
-                <p>We envision a future where First Nations communities along the Alice Springs-Tennant Creek corridor are thriving on their own terms - with strong cultural connections, sustainable housing, meaningful employment opportunities, and self-determined services that truly meet community needs.</p>
-                <p>This initiative brings together the storytelling and human-centered design expertise of A Curious Tractor, the funding and philanthropic experience of The Snow Foundation, and the innovative community-led approaches of organizations like Wilya Janta to support existing local leaders and initiatives.</p>
-                <div class="quote">
+                <h2 class="fade-in">Our Vision</h2>
+                <p class="fade-in delay-100">We envision a future where First Nations communities along the Alice Springs-Tennant Creek corridor are thriving on their own terms - with strong cultural connections, sustainable housing, meaningful employment opportunities, and self-determined services that truly meet community needs.</p>
+                <p class="fade-in delay-200">This initiative brings together the storytelling and human-centered design expertise of A Curious Tractor, the funding and philanthropic experience of The Snow Foundation, and the innovative community-led approaches of organizations like Wilya Janta to support existing local leaders and initiatives.</p>
+                <div class="quote fade-in-right delay-300">
                     <p>"I think this program will work well; it's good that Aboriginal people are stepping up. Our kids need this, they need that guidance, and it is very positive especially for young fellas having a cultural man to support them."</p>
                     <cite>— Community leader from the Warlpiri community</cite>
                 </div>
@@ -65,10 +153,10 @@
     <!-- Community Voices Section -->
     <section id="voices" class="section voices-section">
         <div class="container">
-            <h2>Community Voices</h2>
-            <p class="section-intro">Our approach is shaped by the wisdom, experiences, and aspirations of community members across the corridor:</p>
+            <h2 class="fade-in">Community Voices</h2>
+            <p class="section-intro fade-in delay-100">Our approach is shaped by the wisdom, experiences, and aspirations of community members across the corridor:</p>
             
-            <div class="voices-grid" id="featured-voices">
+            <div class="voices-grid fade-in delay-200" id="featured-voices">
                 <!-- This will be populated with data from Airtable for Kirsty, Norman, and Dianne -->
                 <div class="loading-indicator">
                     <div class="spinner"></div>
