@@ -8,22 +8,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // YouTube Player
     let player;
     window.onYouTubeIframeAPIReady = function() {
-        player = new YT.Player('youtube-player', {
+        player = new YT.Player('youtube-background', {
             videoId: 'mO7a6zXOjJQ', // The Country Corridor video
             playerVars: {
                 'autoplay': 1,
                 'controls': 0,
-                'rel': 0,
                 'showinfo': 0,
+                'modestbranding': 1,
                 'loop': 1,
-                'playlist': 'mO7a6zXOjJQ', // Needed for looping
+                'playlist': 'mO7a6zXOjJQ',
+                'rel': 0,
                 'mute': 1,
                 'playsinline': 1,
-                'modestbranding': 1,
+                'enablejsapi': 1,
+                'origin': window.location.origin,
                 'iv_load_policy': 3,
                 'disablekb': 1,
-                'origin': window.location.origin,
-                'enablejsapi': 1
+                'fs': 0,
+                'start': 5,
+                'autohide': 1,
+                'modestbranding': 1
             },
             events: {
                 'onReady': onPlayerReady,
@@ -34,17 +38,21 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     function onPlayerReady(event) {
-        // Force play video
-        event.target.playVideo();
-        // Ensure the video is muted (required for autoplay)
+        // Set player to mute and play
         event.target.mute();
+        event.target.playVideo();
         
-        // Attempt to play again if needed after a short delay
+        // Force playback quality
         setTimeout(function() {
             if (player && player.getPlayerState() !== YT.PlayerState.PLAYING) {
                 player.playVideo();
             }
-        }, 2000);
+            
+            // Try to force HD playback
+            if (player) {
+                player.setPlaybackQuality('hd1080');
+            }
+        }, 1000);
     }
     
     function onPlayerStateChange(event) {
@@ -61,13 +69,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function onPlayerError(event) {
         console.error('YouTube player error:', event.data);
-        // Try to recover from error by recreating the player
-        if (player) {
-            setTimeout(function() {
-                player.destroy();
-                onYouTubeIframeAPIReady();
-            }, 2000);
-        }
+        // Show the fallback background
+        document.querySelector('.video-fallback').style.opacity = 1;
     }
 
     // Mobile navigation toggle
@@ -469,22 +472,40 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Function to render featured voices
         function renderFeaturedVoices(storytellers) {
+            console.log("Featured storytellers data:", storytellers);
+            
             const voicesHtml = storytellers.map(storyteller => {
                 const fields = storyteller.fields;
                 const storytellerId = storyteller.id;
                 
-                // Handle image
+                // Handle image with enhanced logging
                 let portraitHtml = '';
                 if (fields.Photo && fields.Photo.length > 0) {
-                    // Access the URL directly and use HTTPS
-                    const photoUrl = fields.Photo[0].url.replace('http://', 'https://');
+                    console.log("Photo field found:", fields.Photo[0]);
+                    // Try to access different possible URL fields
+                    let photoUrl = '';
+                    if (fields.Photo[0].url) {
+                        photoUrl = fields.Photo[0].url;
+                    } else if (fields.Photo[0].thumbnails && fields.Photo[0].thumbnails.large) {
+                        photoUrl = fields.Photo[0].thumbnails.large.url;
+                    }
+                    
+                    // Ensure we use HTTPS
+                    photoUrl = photoUrl.replace('http://', 'https://');
+                    console.log("Using photo URL:", photoUrl);
+                    
                     portraitHtml = `<img src="${photoUrl}" alt="${fields.Name || 'Community member'}" loading="lazy">`;
                 }
                 
-                // Use the first quote or default text
+                // Use the first quote or default text with logging
                 let quoteText = "No quote available";
-                if (fields.Quotes && fields.Quotes.length > 0) {
-                    quoteText = fields.Quotes[0];
+                if (fields.Quotes) {
+                    console.log("Quotes field:", fields.Quotes);
+                    if (Array.isArray(fields.Quotes) && fields.Quotes.length > 0) {
+                        quoteText = fields.Quotes[0];
+                    } else if (typeof fields.Quotes === 'string') {
+                        quoteText = fields.Quotes;
+                    }
                 } else if (fields.Summary) {
                     quoteText = fields.Summary;
                 }
@@ -551,11 +572,20 @@ document.addEventListener('DOMContentLoaded', function() {
             const fields = storyteller.fields;
             const storytellerId = storyteller.id;
             
-            // Handle image
+            // Handle image with the same improved approach
             let imageHtml = '';
             if (fields.Photo && fields.Photo.length > 0) {
-                // Access the URL directly and use HTTPS
-                const photoUrl = fields.Photo[0].url.replace('http://', 'https://');
+                // Try to access different possible URL fields
+                let photoUrl = '';
+                if (fields.Photo[0].url) {
+                    photoUrl = fields.Photo[0].url;
+                } else if (fields.Photo[0].thumbnails && fields.Photo[0].thumbnails.large) {
+                    photoUrl = fields.Photo[0].thumbnails.large.url;
+                }
+                
+                // Ensure we use HTTPS
+                photoUrl = photoUrl.replace('http://', 'https://');
+                
                 imageHtml = `<img src="${photoUrl}" alt="${fields.Name || 'Storyteller'}" loading="lazy">`;
             }
             

@@ -286,8 +286,17 @@
                 // Handle image
                 let photoHtml = '';
                 if (fields.Photo && fields.Photo.length > 0) {
-                    // Ensure HTTPS URL
-                    const photoUrl = fields.Photo[0].url.replace('http://', 'https://');
+                    // Try to access different possible URL fields
+                    let photoUrl = '';
+                    if (fields.Photo[0].url) {
+                        photoUrl = fields.Photo[0].url;
+                    } else if (fields.Photo[0].thumbnails && fields.Photo[0].thumbnails.large) {
+                        photoUrl = fields.Photo[0].thumbnails.large.url;
+                    }
+                    
+                    // Ensure we use HTTPS
+                    photoUrl = photoUrl.replace('http://', 'https://');
+                    
                     photoHtml = `<img src="${photoUrl}" alt="${fields.Name || 'Storyteller'}" loading="lazy">`;
                 }
                 
@@ -301,7 +310,16 @@
                 // Handle quotes
                 let quotesHtml = '';
                 if (fields.Quotes) {
-                    const quotes = Array.isArray(fields.Quotes) ? fields.Quotes : [fields.Quotes];
+                    console.log("Quotes field in detail view:", fields.Quotes);
+                    let quotes = [];
+                    
+                    if (Array.isArray(fields.Quotes)) {
+                        quotes = fields.Quotes;
+                    } else if (typeof fields.Quotes === 'string') {
+                        // If it's a single string, make it an array
+                        quotes = [fields.Quotes];
+                    }
+                    
                     quotesHtml = quotes.map(quote => `<div class="quote-item">"${quote}"</div>`).join('');
                 }
                 
