@@ -285,19 +285,39 @@
                 
                 // Handle image
                 let photoHtml = '';
-                if (fields.Photo && fields.Photo.length > 0) {
-                    // Try to access different possible URL fields
-                    let photoUrl = '';
-                    if (fields.Photo[0].url) {
-                        photoUrl = fields.Photo[0].url;
-                    } else if (fields.Photo[0].thumbnails && fields.Photo[0].thumbnails.large) {
-                        photoUrl = fields.Photo[0].thumbnails.large.url;
+                try {
+                    if (fields.Photo && fields.Photo.length > 0) {
+                        // Try to access different possible URL fields
+                        let photoUrl = '';
+                        if (fields.Photo[0].url) {
+                            photoUrl = fields.Photo[0].url;
+                        } else if (fields.Photo[0].thumbnails && fields.Photo[0].thumbnails.large) {
+                            photoUrl = fields.Photo[0].thumbnails.large.url;
+                        } else if (fields.Photo[0].thumbnails && fields.Photo[0].thumbnails.full) {
+                            photoUrl = fields.Photo[0].thumbnails.full.url;
+                        }
+                        
+                        // Ensure we use HTTPS
+                        photoUrl = photoUrl.replace('http://', 'https://');
+                        
+                        if (photoUrl) {
+                            photoHtml = `
+                                <img src="${photoUrl}" 
+                                     alt="${fields.Name || 'Storyteller'}" 
+                                     loading="lazy"
+                                     onerror="this.onerror=null; this.src='https://via.placeholder.com/300x300?text=No+Image'; this.classList.add('fallback-img');">
+                            `;
+                        } else {
+                            // Fallback image if URL is empty
+                            photoHtml = `<img src="https://via.placeholder.com/300x300?text=No+Image" alt="No image available" class="fallback-img">`;
+                        }
+                    } else {
+                        // Fallback for no photo field
+                        photoHtml = `<img src="https://via.placeholder.com/300x300?text=No+Image" alt="No image available" class="fallback-img">`;
                     }
-                    
-                    // Ensure we use HTTPS
-                    photoUrl = photoUrl.replace('http://', 'https://');
-                    
-                    photoHtml = `<img src="${photoUrl}" alt="${fields.Name || 'Storyteller'}" loading="lazy">`;
+                } catch (err) {
+                    console.error("Error creating photo HTML:", err);
+                    photoHtml = `<img src="https://via.placeholder.com/300x300?text=Error+Loading" alt="Error loading image" class="fallback-img">`;
                 }
                 
                 // Handle themes

@@ -93,7 +93,12 @@
     <!-- Hero Section -->
     <div id="hero" class="hero-container">
         <div class="hero-video-container">
-            <div id="youtube-background"></div>
+            <iframe id="youtube-video" 
+                    src="https://www.youtube.com/embed/mO7a6zXOjJQ?autoplay=1&mute=1&loop=1&playlist=mO7a6zXOjJQ&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&playsinline=1&start=5" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen></iframe>
+            <!-- Fallback background if video fails to load -->
             <div class="video-fallback"></div>
             <div class="hero-overlay"></div>
         </div>

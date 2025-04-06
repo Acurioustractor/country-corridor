@@ -1,76 +1,14 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Load YouTube API
-    const tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    const firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    // Add fallback for YouTube video
+    const videoFallback = document.querySelector('.video-fallback');
+    const youtubeVideo = document.getElementById('youtube-video');
     
-    // YouTube Player
-    let player;
-    window.onYouTubeIframeAPIReady = function() {
-        player = new YT.Player('youtube-background', {
-            videoId: 'mO7a6zXOjJQ', // The Country Corridor video
-            playerVars: {
-                'autoplay': 1,
-                'controls': 0,
-                'showinfo': 0,
-                'modestbranding': 1,
-                'loop': 1,
-                'playlist': 'mO7a6zXOjJQ',
-                'rel': 0,
-                'mute': 1,
-                'playsinline': 1,
-                'enablejsapi': 1,
-                'origin': window.location.origin,
-                'iv_load_policy': 3,
-                'disablekb': 1,
-                'fs': 0,
-                'start': 5,
-                'autohide': 1,
-                'modestbranding': 1
-            },
-            events: {
-                'onReady': onPlayerReady,
-                'onStateChange': onPlayerStateChange,
-                'onError': onPlayerError
+    if (youtubeVideo) {
+        youtubeVideo.addEventListener('error', function() {
+            if (videoFallback) {
+                videoFallback.style.opacity = 1;
             }
         });
-    };
-    
-    function onPlayerReady(event) {
-        // Set player to mute and play
-        event.target.mute();
-        event.target.playVideo();
-        
-        // Force playback quality
-        setTimeout(function() {
-            if (player && player.getPlayerState() !== YT.PlayerState.PLAYING) {
-                player.playVideo();
-            }
-            
-            // Try to force HD playback
-            if (player) {
-                player.setPlaybackQuality('hd1080');
-            }
-        }, 1000);
-    }
-    
-    function onPlayerStateChange(event) {
-        // If video ends, restart it
-        if (event.data === YT.PlayerState.ENDED) {
-            event.target.playVideo();
-        } else if (event.data === YT.PlayerState.PAUSED) {
-            // If somehow paused, resume playing
-            setTimeout(function() {
-                event.target.playVideo();
-            }, 500);
-        }
-    }
-    
-    function onPlayerError(event) {
-        console.error('YouTube player error:', event.data);
-        // Show the fallback background
-        document.querySelector('.video-fallback').style.opacity = 1;
     }
 
     // Mobile navigation toggle
@@ -478,23 +416,43 @@ document.addEventListener('DOMContentLoaded', function() {
                 const fields = storyteller.fields;
                 const storytellerId = storyteller.id;
                 
-                // Handle image with enhanced logging
+                // Handle image with enhanced fallback handling
                 let portraitHtml = '';
-                if (fields.Photo && fields.Photo.length > 0) {
-                    console.log("Photo field found:", fields.Photo[0]);
-                    // Try to access different possible URL fields
-                    let photoUrl = '';
-                    if (fields.Photo[0].url) {
-                        photoUrl = fields.Photo[0].url;
-                    } else if (fields.Photo[0].thumbnails && fields.Photo[0].thumbnails.large) {
-                        photoUrl = fields.Photo[0].thumbnails.large.url;
+                try {
+                    if (fields.Photo && fields.Photo.length > 0) {
+                        console.log("Photo field found:", fields.Photo[0]);
+                        // Try to access different possible URL fields
+                        let photoUrl = '';
+                        if (fields.Photo[0].url) {
+                            photoUrl = fields.Photo[0].url;
+                        } else if (fields.Photo[0].thumbnails && fields.Photo[0].thumbnails.large) {
+                            photoUrl = fields.Photo[0].thumbnails.large.url;
+                        } else if (fields.Photo[0].thumbnails && fields.Photo[0].thumbnails.full) {
+                            photoUrl = fields.Photo[0].thumbnails.full.url;
+                        }
+                        
+                        // Ensure we use HTTPS
+                        photoUrl = photoUrl.replace('http://', 'https://');
+                        console.log("Using photo URL:", photoUrl);
+                        
+                        if (photoUrl) {
+                            portraitHtml = `
+                                <img src="${photoUrl}" 
+                                     alt="${fields.Name || 'Community member'}" 
+                                     loading="lazy"
+                                     onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200?text=No+Image'; this.classList.add('fallback-img');">
+                            `;
+                        } else {
+                            // Fallback image if URL is empty
+                            portraitHtml = `<img src="https://via.placeholder.com/300x200?text=No+Image" alt="No image available" class="fallback-img">`;
+                        }
+                    } else {
+                        // Fallback for no photo field
+                        portraitHtml = `<img src="https://via.placeholder.com/300x200?text=No+Image" alt="No image available" class="fallback-img">`;
                     }
-                    
-                    // Ensure we use HTTPS
-                    photoUrl = photoUrl.replace('http://', 'https://');
-                    console.log("Using photo URL:", photoUrl);
-                    
-                    portraitHtml = `<img src="${photoUrl}" alt="${fields.Name || 'Community member'}" loading="lazy">`;
+                } catch (err) {
+                    console.error("Error creating portrait HTML:", err);
+                    portraitHtml = `<img src="https://via.placeholder.com/300x200?text=Error+Loading" alt="Error loading image" class="fallback-img">`;
                 }
                 
                 // Use the first quote or default text with logging
@@ -572,21 +530,41 @@ document.addEventListener('DOMContentLoaded', function() {
             const fields = storyteller.fields;
             const storytellerId = storyteller.id;
             
-            // Handle image with the same improved approach
+            // Handle image with enhanced fallback handling
             let imageHtml = '';
-            if (fields.Photo && fields.Photo.length > 0) {
-                // Try to access different possible URL fields
-                let photoUrl = '';
-                if (fields.Photo[0].url) {
-                    photoUrl = fields.Photo[0].url;
-                } else if (fields.Photo[0].thumbnails && fields.Photo[0].thumbnails.large) {
-                    photoUrl = fields.Photo[0].thumbnails.large.url;
+            try {
+                if (fields.Photo && fields.Photo.length > 0) {
+                    // Try to access different possible URL fields
+                    let photoUrl = '';
+                    if (fields.Photo[0].url) {
+                        photoUrl = fields.Photo[0].url;
+                    } else if (fields.Photo[0].thumbnails && fields.Photo[0].thumbnails.large) {
+                        photoUrl = fields.Photo[0].thumbnails.large.url;
+                    } else if (fields.Photo[0].thumbnails && fields.Photo[0].thumbnails.full) {
+                        photoUrl = fields.Photo[0].thumbnails.full.url;
+                    }
+                    
+                    // Ensure we use HTTPS
+                    photoUrl = photoUrl.replace('http://', 'https://');
+                    
+                    if (photoUrl) {
+                        imageHtml = `
+                            <img src="${photoUrl}" 
+                                 alt="${fields.Name || 'Storyteller'}" 
+                                 loading="lazy"
+                                 onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200?text=No+Image'; this.classList.add('fallback-img');">
+                        `;
+                    } else {
+                        // Fallback image if URL is empty
+                        imageHtml = `<img src="https://via.placeholder.com/300x200?text=No+Image" alt="No image available" class="fallback-img">`;
+                    }
+                } else {
+                    // Fallback for no photo field
+                    imageHtml = `<img src="https://via.placeholder.com/300x200?text=No+Image" alt="No image available" class="fallback-img">`;
                 }
-                
-                // Ensure we use HTTPS
-                photoUrl = photoUrl.replace('http://', 'https://');
-                
-                imageHtml = `<img src="${photoUrl}" alt="${fields.Name || 'Storyteller'}" loading="lazy">`;
+            } catch (err) {
+                console.error("Error creating image HTML:", err);
+                imageHtml = `<img src="https://via.placeholder.com/300x200?text=Error+Loading" alt="Error loading image" class="fallback-img">`;
             }
             
             // Handle themes

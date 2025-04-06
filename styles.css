@@ -174,31 +174,28 @@ a:hover {
     pointer-events: none;
 }
 
-#youtube-player {
+#youtube-video {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    min-width: 150%;
-    min-height: 150%;
+    min-width: 100%;
+    min-height: 100%;
     width: auto;
     height: auto;
     z-index: 1;
     pointer-events: none;
-    opacity: 1;
 }
 
 @media (min-aspect-ratio: 16/9) {
-    #youtube-player {
+    #youtube-video {
         height: 300%;
-        top: -75%;
     }
 }
 
 @media (max-aspect-ratio: 16/9) {
-    #youtube-player {
+    #youtube-video {
         width: 300%;
-        left: -75%;
     }
 }
 
@@ -207,9 +204,9 @@ a:hover {
     top: 50%;
     left: 50%;
     width: 100vw;
-    height: 56.25vw; /* 16:9 aspect ratio */
-    min-height: 100vh;
+    height: 100vh;
     min-width: 177.77vh; /* 16:9 aspect ratio */
+    min-height: 56.25vw; /* 16:9 aspect ratio */
     transform: translate(-50%, -50%);
     pointer-events: none;
     z-index: 1;
